@@ -14,12 +14,12 @@
   <link name='base_link'>
     <pose>0 0 0.01 0 0 0</pose>
     <inertial>
-      <mass value="2.4"/>
-      <origin xyz="0.0 0 0.045" rpy=" 0 0 0"/>
+      <mass value="1.5"/>
+      <origin xyz="0.0 0 0.025" rpy=" 0 0 0"/>
       <inertia
-          ixx="0.0001" ixy="0" ixz="0"
-          iyy="0.0001" iyz="0"
-          izz="0.0001"
+          ixx="0.01" ixy="0" ixz="0"
+          iyy="0.01" iyz="0"
+          izz="0.01"
       />
     </inertial>
 
@@ -48,8 +48,8 @@
       <surface>
         <friction>
           <ode>
-            <mu>0</mu>
-            <mu2>0</mu2>
+            <mu>0.015</mu>
+            <mu2>0.005</mu2>
             <slip1>1.0</slip1>
             <slip2>1.0</slip2>
           </ode>
@@ -84,8 +84,8 @@
       </material>
     </visual>
     <inertial>
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0.035"/>
-      <mass value="0.01"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <mass value="0.0025"/>
       <cylinder_inertia m="0.01" r="0.035" h="0.021"/>
       <inertia
         ixx="0.001" ixy="0.0" ixz="0.0"
@@ -112,8 +112,8 @@
       </material>
     </visual>
     <inertial>
-      <origin rpy="0 1.5707 1.5707" xyz="0 0 0.035"/>
-      <mass value="0.01"/>
+      <origin rpy="0 1.5707 1.5707" xyz="0 0 0"/>
+      <mass value="0.025"/>
       <cylinder_inertia m="0.01" r="0.035" h="0.021"/>
       <inertia
         ixx="0.001" ixy="0.0" ixz="0.0"
@@ -123,7 +123,7 @@
   </link>
 
 
-  <joint type="continuous" name="left_wheel_hinge">
+  <joint type="continuous" name="left_wheel_joint">
     <origin xyz="0 -0.09 0.025" rpy="0 0 0"/>
     <child link="left_wheel"/>
     <parent link="base_link"/>
@@ -132,7 +132,7 @@
     <joint_properties damping="0.0" friction="0.0"/>
   </joint>
 
-  <joint type="continuous" name="right_wheel_hinge">
+  <joint type="continuous" name="right_wheel_joint">
     <origin xyz="0 0.082 0.025" rpy="0 0 0"/>
     <child link="right_wheel"/>
     <parent link="base_link"/>
@@ -141,6 +141,93 @@
     <joint_properties damping="0.0" friction="0.0"/>
   </joint>
 
+  <gazebo>
+        <plugin name='diff_drive' filename='libgazebo_ros_diff_drive.so'>
+    
+    
+            <!-- Wheel Information -->
+            <leftJoint>left_wheel_joint</leftJoint>
+            <rightJoint>right_wheel_joint</rightJoint>
+            <wheelSeparation>0.14</wheelSeparation>
+            <wheel_diameter>0.07</wheel_diameter>
+	    <wheelDiameter>0.07</wheelDiameter>
+    
+
+            <!-- Limits -->
+            <max_wheel_torque>150</max_wheel_torque>
+            <max_wheel_acceleration>2.0</max_wheel_acceleration>
+	    <wheelAcceleration>1.0</wheelAcceleration>
+	    <wheelTorque>1.0</wheelTorque>
+    
+
+            <!-- Output -->
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            
+
+	        <commandTopic>cmd_vel</commandTopic>
+		    <odometryTopic>odom</odometryTopic>
+		    <odometryFrame>odom</odometryFrame>
+		    <odometrySource>world</odometrySource>
+		    
+		    <robotBaseFrame>base_footprint</robotBaseFrame>
+		    <publishWheelTF>true</publishWheelTF>
+		    <publishTf>true</publishTf>
+		    <publishWheelJointState>true</publishWheelJointState>
+		    <legacyMode>false</legacyMode>
+		    <updateRate>30</updateRate>
+    
+    
+        </plugin>
+  </gazebo>
+
+  <joint name="lidar_joint" type="fixed">
+    <axis xyz="0 1 0" />
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="rplidar_link"/>
+  </joint>
+  <link name="rplidar_link">
+    <collision>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <geometry>
+    <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+  </link>
+  <gazebo reference="rplidar_link">
+        <material>Gazebo/Red</material>
+ 
+        <sensor name="laser" type="ray">
+            <pose> 0 0 0 0 0 0 </pose>
+            <visualize>true</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>360</samples>
+                        <min_angle>-3.14</min_angle>
+                        <max_angle>3.14</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.3</min>
+                    <max>12</max>
+                </range>
+            </ray>
+            <plugin name="laser_controller" filename="libgazebo_ros_laser.so">
+                <ros>
+                    <argument>~/out:=scan</argument>
+                </ros>
+                <topicName>/scan</topicName>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <frameName>rplidar_link</frameName>
+            </plugin>
+        </sensor>
+    </gazebo>
 
 
 
