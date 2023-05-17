@@ -166,6 +166,7 @@
 
             <publish_odom>true</publish_odom>
             <publish_odom_tf>true</publish_odom_tf>
+	    <publishOdomTF>true</publishOdomTF>
             
 
 	        <commandTopic>cmd_vel</commandTopic>
@@ -214,7 +215,7 @@
                     </horizontal>
                 </scan>
                 <range>
-                    <min>0.3</min>
+                    <min>0.15</min>
                     <max>12</max>
                 </range>
             </ray>
