@@ -1,0 +1,8 @@
+<launch>
+  <param name="robot_description" textfile="$(find hykabai_simulations)/urdf/hykabai.urdf"/>
+  <arg name="rvizconfig" default="$(find hykabai_navigation)/rviz/hykabai_nav.rviz" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
+</launch>
+
